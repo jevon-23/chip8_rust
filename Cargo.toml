@@ -1,0 +1,25 @@
+[package]
+name = "r_chip8"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+
+# winit dependencies
+winit = "0.27"
+env_logger = "0.9"
+log = "0.4"
+wgpu = "0.14"
+pixels = { path = "include/pixels" }
+winit_input_helper = "0.13"
+
+rand = "0.8.5"
+chrono="0.4.23"
+time = "0.3.17"
+
+[features]
+optimize = ["log/release_max_level_warn"]
+default = ["optimize"]
+
