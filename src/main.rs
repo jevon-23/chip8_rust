@@ -1,12 +1,16 @@
+/* Standard imports */
 use std::fs::File;
 use std::io::Read;
 use std::fs;
 use std::env;
 use std::process;
+
+/* Local imports */
 mod memory;
 mod display;
 mod cpu;
 
+/* winit */
 use winit::{
     event::{Event, VirtualKeyCode},
     event_loop::{ControlFlow, EventLoop},
@@ -18,9 +22,11 @@ use pixels::{Error, Pixels, SurfaceTexture};
 use winit::dpi::LogicalSize;
 use winit_input_helper::WinitInputHelper;
 
+/* Screen dimensions */
 const WIDTH: u32 = 220;
 const HEIGHT: u32 = 140;
 
+/* Check to see if they passed in enough args */
 fn process_args(args : &Vec<String>) {
     if args.len() != 2 {
         println!("Not enough arguments");
@@ -29,6 +35,7 @@ fn process_args(args : &Vec<String>) {
 }
 
 /* https://www.reddit.com/r/rust/comments/dekpl5/how_to_read_binary_data_from_a_file_into_a_vecu8/ */
+/* Read binary file back as a Vector of bytes */
 fn get_file_as_byte_vec(filename: &String) -> Vec<u8> {
     let mut f = File::open(&filename).expect("no file found");
     let metadata = fs::metadata(&filename).expect("unable to read metadata");
@@ -39,6 +46,7 @@ fn get_file_as_byte_vec(filename: &String) -> Vec<u8> {
 }
 
 fn main() -> Result<(), Error>{
+    /* Process args */
     let args : Vec<String> = env::args().collect();
     process_args(&args);
 
@@ -46,19 +54,18 @@ fn main() -> Result<(), Error>{
     let file_path : &String = &args[1];
     dbg!(file_path);
 
+    /* Read the game file */
     let game : Vec<u8> = get_file_as_byte_vec(file_path);
 
-    println!("Hello, world!");
+    /* Create memroy and store game file into memory */
     let mut mem: memory::Mem = memory::make_memory();
     mem.store_game(game);
 
-    println!("Mem data_len: {}", mem.data.len());
-
+    /* Create new cpu instance, and prepare to run */
     let mut _c : cpu::CPU = cpu::make_cpu(mem);
 
-    /*
-       https://github.com/parasyte/pixels/blob/864a9c3491cb2aa778a8c0ae5742f760bcfac622/examples/minimal-winit/src/main.rs
-       */
+    /* https://github.com/parasyte/pixels/blob/864a9c3491cb2aa778a8c0ae5742f760bcfac622/examples/minimal-winit/src/main.rs */
+    /* Prepare window, and event loop for rendering */
     env_logger::init();
     let event_loop = EventLoop::new();
     let mut input = WinitInputHelper::new();
@@ -71,16 +78,20 @@ fn main() -> Result<(), Error>{
             .build(&event_loop)
             .unwrap()
     };
-
     let mut pixels = {
         let window_size = window.inner_size();
         let surface_texture = SurfaceTexture::new(window_size.width, window_size.height, &window);
         Pixels::new(WIDTH, HEIGHT, surface_texture)?
     };
     let world = cpu::World::new();
+
+    /* The number of instructions executed, keep at 700 / second */
     let mut num_instructions_finished : u16 = 0;
+    /* Timer to help with 700 / second instructions exec */
     let mut sys_timer : cpu::Timer = cpu::Timer::new();
     event_loop.run(move |event, _, control_flow| {
+
+        /* Get new input key and update timers */
         let mut input_key : u8 =  0xf0;
         _c.sound_timer.tick();
         _c.delay_timer.tick();
@@ -101,52 +112,52 @@ fn main() -> Result<(), Error>{
                 *control_flow = ControlFlow::Exit;
                 return;
             } else if input.key_pressed(VirtualKeyCode::Key1) || input.key_held(VirtualKeyCode::Key1) {
-                println!("1 is button is pushed");
+                // println!("1 is button is pushed");
                 input_key = 0x01;
             } else if input.key_pressed(VirtualKeyCode::Key2) || input.key_held(VirtualKeyCode::Key2){
-                println!("2 is button is pushed");
+                // println!("2 is button is pushed");
                 input_key = 0x02;
             } else if input.key_pressed(VirtualKeyCode::Key3) || input.key_held(VirtualKeyCode::Key3) {
-                println!("3 is button is pushed");
+                // println!("3 is button is pushed");
                 input_key = 0x03;
             } else if input.key_pressed(VirtualKeyCode::Key4) || input.key_held(VirtualKeyCode::Key4) {
-                println!("4 is button is pushed");
+                // println!("4 is button is pushed");
                 input_key = 0x0C;
             } else if input.key_pressed(VirtualKeyCode::Q) || input.key_held(VirtualKeyCode::Q) {
-                println!("Q is button is pushed");
+                // println!("Q is button is pushed");
                 input_key = 0x04;
             } else if input.key_pressed(VirtualKeyCode::W) || input.key_held(VirtualKeyCode::W) {
-                println!("W is button is pushed");
+                // println!("W is button is pushed");
                 input_key = 0x05;
             } else if input.key_pressed(VirtualKeyCode::E) || input.key_held(VirtualKeyCode::E) {
-                println!("E is button is pushed");
+                // println!("E is button is pushed");
                 input_key = 0x06;
             } else if input.key_pressed(VirtualKeyCode::R) || input.key_held(VirtualKeyCode::R) {
-                println!("R is button is pushed");
+                // println!("R is button is pushed");
                 input_key = 0x0D;
             } else if input.key_pressed(VirtualKeyCode::A) || input.key_held(VirtualKeyCode::A) {
-                println!("A is button is pushed");
+                // println!("A is button is pushed");
                 input_key = 0x07;
             } else if input.key_pressed(VirtualKeyCode::S) || input.key_held(VirtualKeyCode::S) {
-                println!("S is button is pushed");
+                // println!("S is button is pushed");
                 input_key = 0x08;
             } else if input.key_pressed(VirtualKeyCode::D) || input.key_held(VirtualKeyCode::D) {
-                println!("D is button is pushed");
+                // println!("D is button is pushed");
                 input_key = 0x09;
             } else if input.key_pressed(VirtualKeyCode::F) || input.key_held(VirtualKeyCode::F) {
-                println!("F is button is pushed");
+                // println!("F is button is pushed");
                 input_key = 0x0e;
             } else if input.key_pressed(VirtualKeyCode::Z) || input.key_held(VirtualKeyCode::Z) {
-                println!("Z is button is pushed");
+                // println!("Z is button is pushed");
                 input_key = 0x0a;
             } else if input.key_pressed(VirtualKeyCode::X) || input.key_held(VirtualKeyCode::X) {
-                println!("X is button is pushed");
+                // println!("X is button is pushed");
                 input_key = 0x00;
             } else if input.key_pressed(VirtualKeyCode::C) || input.key_held(VirtualKeyCode::C) {
-                println!("C is button is pushed");
+                // println!("C is button is pushed");
                 input_key = 0x0b;
             } else if input.key_pressed(VirtualKeyCode::V) || input.key_held(VirtualKeyCode::V) {
-                println!("V is button is pushed");
+                // println!("V is button is pushed");
                 input_key = 0x0f;
             }         
 
@@ -158,8 +169,7 @@ fn main() -> Result<(), Error>{
                 return;
             }
         }
-        // println!("input key: {:#01x}", input_key);
-        // Update internal state and request a redraw
+        /* Execute instruction, keep within 700 instructions / second */
         if num_instructions_finished % 700 == 0 {
             if sys_timer.get_elapsed_time() > sys_timer.curr_second {
                 sys_timer.curr_second = sys_timer.get_elapsed_time();
@@ -170,6 +180,8 @@ fn main() -> Result<(), Error>{
             _c.exec(input_key);
             num_instructions_finished += 1;
         }
+
+        /* Request a redraw */
         window.request_redraw();
     }
 

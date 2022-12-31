@@ -18,6 +18,7 @@ fn test_make_mem() {
 }
 
 
+/* Test read and writes */
 #[test]
 fn test_mem_wr16() {
     let mut m1: Mem = make_memory();

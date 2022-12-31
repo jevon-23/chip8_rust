@@ -1,5 +1,6 @@
 use super::*;
 
+/* Boost my test coverage */
 #[test]
 fn test_display() {
     let d1: Display = make_display();

@@ -6,13 +6,19 @@ pub struct Mem {
     pub data: [u8; 4096],
 }
 
+/* First 0x200 Bytes are usually taken up by the interpreter */
 pub const _INTERP_START: usize = 0x00;
 pub const _INTERP_END: usize   = 0x1FF;
-pub const _PROG_START: usize   = 0x200;
-pub const _PROG_END: usize     = 0x1FFF;
+
+/* Storing the fonts that the programs use */
 pub const _FONT_START: usize   = 0x050;
 pub const _FONT_END: usize     = 0x09F;
 
+/* Start of the program stored at 0x200 */
+pub const _PROG_START: usize   = 0x200;
+pub const _PROG_END: usize     = 0x1FFF; /* unused */
+
+/* The characters that we are using for fonts */
 pub const FONTS: [u8; 80] =  [
     0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
     0x20, 0x60, 0x20, 0x20, 0x70, // 1
@@ -48,6 +54,7 @@ pub fn make_memory() -> Mem {
 }
 
 impl Mem {
+    /* Write a byte to memory at ADDRESS */
     pub fn write8(&mut self, address : usize, data : u8)->bool {
         if (address < 1) || (address > self.data.len() - 1) {
             return false;
@@ -65,6 +72,7 @@ impl Mem {
         return true;
     }
 
+    /* Read a byte from memory @ ADDRESS */
     pub fn read8(&mut self, address : usize)->u8 {
         let mut out : u8 = 0x00;
         if (address < 1) || (address > self.data.len() - 1) {
